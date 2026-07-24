@@ -1,7 +1,7 @@
 {
   "name": "net-bin",
   "version": "1.0.0",
-  "description": "Dump any link, all yours.",
+  "description": "Dump any link, note, text, image(working on it), document(working on it), all yours.",
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",

@@ -2,7 +2,11 @@ import express from "express";
 import "dotenv/config";
 import path from "path";
 import { fileURLToPath } from "url";
+
+// Route imports
 import authRoutes from "./routes/authRoutes.js";
+import itemRoutes from "./routes/itemRoutes.js";
+import authMiddleware from "./middleware/authMiddleware.js";
 
 // Initial config
 const app = express();
@@ -17,7 +21,8 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "..", "public")));
 
 // Routes
-app.use("/auth", authRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/items", authMiddleware, itemRoutes);
 
 app.listen(PORT, () => {
   console.log(`server is running at port ${PORT}`);

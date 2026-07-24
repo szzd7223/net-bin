@@ -12,17 +12,28 @@ datasource db {
   provider = "postgresql"
 }
 
+enum ItemType {
+  TEXT
+  LINK
+}
+
 model User { 
   id    Int     @id @default(autoincrement()) 
   email String  @unique
   password  String
-  links Link[]
+
+  items Item[]
 }
 
-model Link {
-  id        Int     @id @default(autoincrement()) 
+model Item {
+  id        Int      @id @default(autoincrement())
   title     String
-  linkUrl   String
-  owner    User    @relation(fields: [ownerId], references: [id]) 
-  ownerId  Int
+  type      ItemType
+  content String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  owner      User @relation(fields: [ownerId], references: [id])
+  ownerId    Int
 }

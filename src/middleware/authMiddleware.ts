@@ -2,13 +2,15 @@ import "dotenv/config";
 import jwt from "jsonwebtoken";
 
 const authMiddleware = (req, res, next) => {
-  const { token } = req.headers["authorization"];
+  const authHeader = req.headers.authorization;
 
-  if (!token) {
-    res.json({
+  if (!authHeader) {
+    return res.json({
       message: "No token provided",
     });
   }
+
+  const token = authHeader.split(" ")[1];
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
@@ -17,7 +19,7 @@ const authMiddleware = (req, res, next) => {
       });
     }
 
-    req.userId = decoded;
+    req.userId = decoded.id;
 
     next();
   });

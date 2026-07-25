@@ -3,11 +3,11 @@ import bcrypt from "bcrypt";
 import { prisma } from "../db/prisma.js";
 
 const registerController = async (req, res) => {
-  const { email, password } = req.body;
+  const { name, email, password } = req.body;
 
-  if (!email || !password) {
+  if (!name || !email || !password) {
     return res.json({
-      message: "Email and Password can't be empty",
+      message: "Name, Email and Password can't be empty",
     });
   }
 
@@ -15,6 +15,7 @@ const registerController = async (req, res) => {
     const hashedPassword = bcrypt.hashSync(password, 10);
     const user = await prisma.user.create({
       data: {
+        name: name,
         email: email,
         password: hashedPassword,
       },
@@ -26,7 +27,10 @@ const registerController = async (req, res) => {
 
     res.status(201).json({
       message: "User created",
-      email,
+      user: {
+        name: name,
+        email: email,
+      },
       token,
     });
   } catch (err) {
@@ -53,7 +57,7 @@ const loginController = async (req, res) => {
 
     if (!user) {
       return res.json({
-        messgae: "Invalid credentials",
+        message: "Invalid credentials",
       });
     }
 
@@ -71,7 +75,10 @@ const loginController = async (req, res) => {
 
     res.status(200).json({
       message: "Logged in successfully",
-      email,
+      user: {
+        name: user.name,
+        email: email,
+      },
       token,
     });
   } catch (err) {

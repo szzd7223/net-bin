@@ -1,3 +1,4 @@
+import { Prisma } from "../../generated/prisma/client.js";
 import { prisma } from "../db/prisma.js";
 
 const getAllItemsController = async (req, res) => {
@@ -10,7 +11,7 @@ const getAllItemsController = async (req, res) => {
       },
     });
 
-    res.json(items);
+    res.status(200).json(items);
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
@@ -18,7 +19,6 @@ const getAllItemsController = async (req, res) => {
 };
 
 const createItemController = async (req, res) => {
-  console.log(req.body);
   const { title, content, type } = req.body;
 
   if (!title || !content || !type) {
@@ -42,9 +42,77 @@ const createItemController = async (req, res) => {
   }
 };
 
-const updateItemController = async (req, res) => {};
+const updateItemController = async (req, res) => {
+  const itemId = req.params.id;
+  const { title, content, type } = req.body;
 
-const deleteItemController = async (req, res) => {};
+  const updateItemData: Prisma.ItemUpdateInput = {};
+
+  if (title !== undefined) {
+    updateItemData.title = title;
+  }
+  if (content !== undefined) {
+    updateItemData.content = content;
+  }
+  if (type !== undefined) {
+    updateItemData.type = type;
+  }
+
+  try {
+    await prisma.item.update({
+      where: {
+        id: parseInt(itemId),
+      },
+      data: updateItemData,
+    });
+
+    return res.status(200).json({
+      message: "Item updated successfully",
+    });
+  } catch (err) {
+    if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.code === "P2025"
+    ) {
+      return res.status(404).json({
+        message: "Item not found",
+      });
+    }
+
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+const deleteItemController = async (req, res) => {
+  const itemId = req.params.id;
+
+  try {
+    await prisma.item.delete({
+      where: {
+        id: parseInt(itemId),
+      },
+    });
+
+    res.status(200).json({
+      message: "Item deleted successfully",
+    });
+  } catch (err) {
+    if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.code === "P2025"
+    ) {
+      return res.status(404).json({
+        message: "Item not found",
+      });
+    }
+
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
 
 export {
   getAllItemsController,
